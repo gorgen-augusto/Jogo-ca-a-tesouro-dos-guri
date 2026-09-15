@@ -1,0 +1,100 @@
+programa
+{
+	inclua biblioteca Util
+	inclua biblioteca Matematica
+
+	cadeia matriz_tabuleiro[5][5]
+	inteiro bateria = 100
+	inteiro creditos_obtidos = 0
+	inteiro posicao_risco_casa = -1
+	inteiro limite_n1 = 0
+	inteiro limite_n2 = 0
+
+	// Funções Obrigatórias
+	funcao Bonus(inteiro valor) {
+		bateria = bateria + valor
+		creditos_obtidos = creditos_obtidos + valor
+	}
+
+	funcao Risco() {
+		bateria = bateria - 3
+	}
+
+	funcao DiminuirBateria() {
+		bateria = bateria - 10
+	}
+
+	funcao inteiro sortear_casa_unica(inteiro min, inteiro max, inteiro ocupadas[], inteiro total) {
+		inteiro sorteada
+		logico repetida
+		faca {
+			sorteada = Util.sorteia(min, max)
+			repetida = falso
+			para (inteiro i = 0; i < total; i++) {
+				se (ocupadas[i] == sorteada) { repetida = verdadeiro }
+			}
+		} enquanto (repetida)
+		retorne sorteada
+	}
+
+	funcao GerarCenario() {
+		real p1, p2
+		inteiro casas_ocupadas[25]
+		inteiro total_ocupadas = 0
+
+		escreva("=== CONFIGURAÇÃO DOS NÍVEIS ===\n")
+		faca {
+			escreva("Digite o percentual do Nível I (%): ")
+			leia(p1)
+			escreva("Digite o percentual do Nível II (%): ")
+			leia(p2)
+		} enquanto (p1 <= 0 ou p2 <= 0 ou (p1 + p2) >= 100.0)
+
+		limite_n1 = Matematica.arredondar(25.0 * (p1 / 100.0), 0)
+		limite_n2 = Matematica.arredondar(25.0 * ((p1 + p2) / 100.0), 0)
+
+		para (inteiro l = 0; l < 5; l++) {
+			para (inteiro c = 0; c < 5; c++) { matriz_tabuleiro[l][c] = "   " }
+		}
+
+		inteiro casa_b05 = sortear_casa_unica(1, 25, casas_ocupadas, total_ocupadas)
+		casas_ocupadas[total_ocupadas] = casa_b05
+		total_ocupadas++
+		matriz_tabuleiro[(casa_b05 - 1) / 5][(casa_b05 - 1) % 5] = "B05"
+
+		inteiro casa_b10 = sortear_casa_unica(1, 25, casas_ocupadas, total_ocupadas)
+		casas_ocupadas[total_ocupadas] = casa_b10
+		total_ocupadas++
+		matriz_tabuleiro[(casa_b10 - 1) / 5][(casa_b10 - 1) % 5] = "B10"
+
+		posicao_risco_casa = sortear_casa_unica(limite_n1 + 1, 25, casas_ocupadas, total_ocupadas)
+		casas_ocupadas[total_ocupadas] = posicao_risco_casa
+		total_ocupadas++
+		matriz_tabuleiro[(posicao_risco_casa - 1) / 5][(posicao_risco_casa - 1) % 5] = "RIS"
+
+		inteiro casa_tesouro = sortear_casa_unica(limite_n1 + 1, 25, casas_ocupadas, total_ocupadas)
+		casas_ocupadas[total_ocupadas] = casa_tesouro
+		total_ocupadas++
+		matriz_tabuleiro[(casa_tesouro - 1) / 5][(casa_tesouro - 1) % 5] = "$$$"
+	}
+
+	funcao inicio()
+	{
+		GerarCenario()
+
+		para (inteiro casa_atual = 1; casa_atual <= 25; casa_atual++) {
+			se (bateria < 10) { pare }
+
+			DiminuirBateria()
+
+			inteiro linha = (casa_atual - 1) / 5
+			inteiro coluna = (casa_atual - 1) % 5
+			cadeia conteudo = matriz_tabuleiro[linha][coluna]
+
+			se (conteudo == "B05") { Bonus(5) }
+			senao se (conteudo == "B10") { Bonus(10) }
+			senao se (conteudo == "RIS") { Risco() }
+			senao se (conteudo == "$$$") { pare }
+		}
+	}
+}
