@@ -1,0 +1,48 @@
+programa
+{
+	inclua biblioteca Matematica
+
+	// ==========================================
+	// VARIÁVEIS GLOBAIS DE ESTADO
+	// ==========================================
+	cadeia matriz_tabuleiro[5][5]
+	inteiro bateria = 100
+	inteiro creditos_obtidos = 0
+	inteiro limite_n1 = 0
+	inteiro limite_n2 = 0
+
+	funcao CalcularLimites()
+	{
+		real p1, p2, p3
+
+		escreva("=== CONFIGURAÇÃO DOS NÍVEIS ===\n")
+		faca {
+			escreva("Digite o percentual do Nível I (%): ")
+			leia(p1)
+			escreva("Digite o percentual do Nível II (%): ")
+			leia(p2)
+
+			se (p1 <= 0 ou p2 <= 0 ou (p1 + p2) >= 100.0) {
+				escreva("\n[ERRO] A soma dos Níveis I e II deve ser menor que 100%. Tente novamente.\n\n")
+			}
+		} enquanto (p1 <= 0 ou p2 <= 0 ou (p1 + p2) >= 100.0)
+
+		// Cálculo automático do Nível III
+		p3 = 100.0 - (p1 + p2)
+		escreva("Percentual do Nível III (calculado automaticamente): ", p3, "%\n")
+
+		// Arredondamento convencional
+		limite_n1 = Matematica.arredondar(25.0 * (p1 / 100.0), 0)
+		limite_n2 = Matematica.arredondar(25.0 * ((p1 + p2) / 100.0), 0)
+
+		escreva("\nLimites calculados:\n")
+		escreva("Nível I: Casas 01 a ", limite_n1, "\n")
+		escreva("Nível II: Casas ", (limite_n1 + 1), " a ", limite_n2, "\n")
+		escreva("Nível III: Casas ", (limite_n2 + 1), " a 25\n\n")
+	}
+
+	funcao inicio()
+	{
+		CalcularLimites()
+	}
+}
